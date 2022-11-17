@@ -1,6 +1,10 @@
 package ru.croc.task8;
 
+import ru.croc.task8.exceprions.NoDoubleEnteredException;
+import ru.croc.task8.exceprions.WrongLocaleEnteredException;
+
 import java.text.NumberFormat;
+import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -8,33 +12,59 @@ import java.util.Scanner;
 public class Task8 {
     public static void main(String[] args) {
         double sum = 0;
-        System.out.print("Enter a double: ");
 
         Scanner scanner = new Scanner(System.in);
+        String s = "";
+        String language ="";
+        String country = "";
 
-        //просим ввести double, если вводят другое - RunTimeException
-        //не знаю, можно ли из RunTimeException в Exception, чтобы потом обработать
-        // (попросить пользователя ввести сумму снова, например)
+        System.out.print("Enter language and country: ");
+        System.out.println("");
+        s = scanner.nextLine();
+        String[] localeData = s.split(" ");
+
+       NumberFormat format = NumberFormat.getCurrencyInstance(Locale.getDefault());
+
         try {
-            sum = scanner.nextDouble();
-        } catch (NumberFormatException ex) {
-            System.err.println(ex.getMessage());
+            language = localeData[0];
+            country = localeData[1];
+            Locale customLocale = new Locale.Builder().setLanguage(language).setRegion(country).build();
+            format = NumberFormat.getCurrencyInstance(customLocale);
+        }
+        catch (IndexOutOfBoundsException e){ //Если ввели менее двух слов
+            try{
+                throw new WrongLocaleEnteredException("You should enter two words: language and country",e);
+            }catch (WrongLocaleEnteredException ex){
+                System.err.println(ex.getMessage());
+                System.err.println("Default locale was set");
+            }
+        }
+        catch (IllformedLocaleException e){//Если такой локали не существует
+            try {
+                // System.out.println(e.getMessage());
+                throw new WrongLocaleEnteredException("There is no such locale",language,country,e);
+            }catch (WrongLocaleEnteredException ex){
+                System.err.println(ex.getMessage());
+                System.err.println("Default locale was set");
+            }
         }
 
-        Locale defaultLocale = Locale.getDefault();
-        NumberFormat format = NumberFormat.getCurrencyInstance(defaultLocale);
+        System.out.print("");
+        System.out.print("Enter a double: ");
+
+        try {
+             if (scanner.hasNextDouble()) {
+                  sum = scanner.nextDouble();
+             } else {
+                  throw new NoDoubleEnteredException("No double entered, try again");
+             }
+        } catch (NoDoubleEnteredException e) {
+               System.err.println(e.getMessage());
+        }
+        scanner.close();
+
         System.out.println(format.format(sum));
-        /*
-        тут не получилось:(
-        System.out.println("Enter language: ");
-        String language = scanner.nextLine();
-        System.out.println("Enter country: ");
-        String country = scanner.nextLine();
 
-        Locale chosenLocale = new Locale(language,country);
-        format = NumberFormat.getCurrencyInstance(chosenLocale);
-
-        */
 
     }
 }

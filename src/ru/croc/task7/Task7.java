@@ -1,8 +1,8 @@
 package ru.croc.task7;
 
 
-import ru.croc.task7.ChessExceptions.IllegalMoveException;
-import ru.croc.task7.ChessExceptions.IllegalPositionException;
+import ru.croc.task7.chessExceptions.IllegalMoveException;
+import ru.croc.task7.chessExceptions.IllegalPositionException;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -25,6 +25,7 @@ public class Task7 {
 
     public static void main(String[] args) {
 
+        //ПРОВЕРКА конструкторов и parse
         /*try{
             ChessPosition pos = new ChessPosition(0,1);
             System.out.println("Через конструктор: "+ pos);
@@ -54,7 +55,7 @@ public class Task7 {
                 System.err.println(ex.getMessage());
             }
         }
-
+        // проверяем ходит ли так конь
         try{
             isItKnightMove(positions);
             System.out.println("Конь так ходит:)");

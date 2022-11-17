@@ -1,4 +1,4 @@
-package ru.croc.task7.ChessExceptions;
+package ru.croc.task7.chessExceptions;
 
 import ru.croc.task7.ChessPosition;
 

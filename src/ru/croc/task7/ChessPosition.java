@@ -1,6 +1,6 @@
 package ru.croc.task7;
 
-import ru.croc.task7.ChessExceptions.IllegalPositionException;
+import ru.croc.task7.chessExceptions.IllegalPositionException;
 
 public class ChessPosition {
     /* X,Y от 0 до 7, но при выводе и вводе учитываю,
