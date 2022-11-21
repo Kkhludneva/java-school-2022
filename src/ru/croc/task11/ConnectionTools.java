@@ -5,6 +5,7 @@ import java.net.Socket;
 
 public class ConnectionTools {
 
+    /*Сюда убрала потоки ввода\вывода, отправку сообщение */
     public static void writeLine(String message, Socket socket){
         try{
             BufferedWriter writer= new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
