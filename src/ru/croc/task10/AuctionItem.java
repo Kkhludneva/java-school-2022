@@ -12,10 +12,6 @@ public class AuctionItem {
     public static final LocalDateTime ENDING_TIME = LocalDateTime.now().plus(30, ChronoUnit.SECONDS);
 
 
-    /*public AuctionItem(){
-        this.currentPrice = 500;//пусть будет начальная цена
-        this.buyerName = "None";
-    }*/
     public static void bet(int newPrice, String buyer){
         if (LocalDateTime.now().isBefore(ENDING_TIME) && newPrice>currentPrice) {
             NumberFormat format = NumberFormat.getCurrencyInstance(Locale.getDefault());
