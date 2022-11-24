@@ -5,15 +5,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
+
     public static void main(String[] args)  {
+
         try(ServerSocket serverSocket= new ServerSocket(2021)){
             System.out.println("Server Started");
-            Socket socket = serverSocket.accept();
-            while(true) {
 
-                String s = "Пришло сообщение: " + ConnectionTools.readLine(socket);
-                System.out.println(s);
-                ConnectionTools.writeLine(s,socket);
+            while(!serverSocket.isClosed()) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Новое подключение...");
+                Thread newClient = new Thread(new ClientConnectionRunnable(socket));
+                newClient.start();
             }
 
         }catch (IOException e){
@@ -21,5 +23,6 @@ public class Server {
         }
         System.out.println("client connected");
     }
+
 
 }
