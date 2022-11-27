@@ -13,7 +13,7 @@ public class Server {
 
             while(!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
-                System.out.println("Новое подключение...");
+                System.out.println("Есть новое подключение...");
                 Thread newClient = new Thread(new ClientConnectionRunnable(socket));
                 newClient.start();
             }

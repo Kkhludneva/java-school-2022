@@ -3,31 +3,13 @@ package ru.croc.task11;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ClientConnectionRunnable implements Runnable {
 
-    /*Сюда убрала потоки ввода\вывода, отправку сообщение */
-    /*public static void writeLine(String message, Socket socket){
-        try{
-            BufferedWriter writer= new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            writer.write(message);
-            writer.newLine();
-            writer.flush();
-        }catch (IOException e){
-            throw new RuntimeException();
-        }
-    }
-    public static String readLine(Socket socket){
-        try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            return reader.readLine();
-        }catch (IOException e){
-            throw new RuntimeException();
-        }
-    }*/
-
-    //чтобы отправлять сообщение нескольким клиентам, пробегаясь по массиву
-    public static ArrayList<ClientConnectionRunnable> connectedClients = new ArrayList<>();
+    //чтобы хранить всех подключенных клиентов, и иметь возможность разослать всем сообщение
+    public static List<ClientConnectionRunnable> connectedClients = Collections.synchronizedList(new ArrayList<>());
 
     private Socket socket;
     private BufferedReader reader;
@@ -36,54 +18,55 @@ public class ClientConnectionRunnable implements Runnable {
     private String userName;
     private String message;
 
-    public ClientConnectionRunnable(Socket socket){
-        try{
+    public ClientConnectionRunnable(Socket socket) {
+        try {
             this.socket = socket;
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.userName = reader.readLine();
             connectedClients.add(this);
-            sendToEveryone("---"+this.userName+" вошел в чат");
-        }catch(IOException e){
-            //закрыть ридеры и райтеры
+            sendToEveryone("---" + this.userName + " вошел в чат");
+        } catch (IOException e) {
+            closingTools(socket, writer, reader);
         }
     }
+
     @Override
     public void run() {
-        while (socket.isConnected()){
-            try{
+        while (socket.isConnected()) {
+            try {
                 message = reader.readLine();
                 sendToEveryone(message);
-            }catch (IOException e){//ошибка возникнет если
-                closingTools(socket,writer,reader);
+            } catch (IOException e) {
+                closingTools(socket, writer, reader);
                 break;
             }
         }
     }
 
-    public void sendToEveryone(String message){
-        for(ClientConnectionRunnable client : connectedClients){
-            try{
-                if(!client.equals(this)){
+    public void sendToEveryone(String message) {
+        for (ClientConnectionRunnable client : connectedClients) {
+            try {
+                if (!client.equals(this)) {
                     client.writer.write(message);
                     client.writer.newLine();
                     client.writer.flush();
 
                 }
-            }catch(IOException e){
-                closingTools(socket,writer,reader);
+            } catch (IOException e) {
+                closingTools(socket, writer, reader);
             }
         }
     }
 
-    public void disconnectClient(){
+    public void disconnectClient() {
         connectedClients.remove(this);
-        sendToEveryone("---"+userName+" вышел из чата");
+        sendToEveryone("---" + userName + " вышел из чата");
     }
 
-    public void closingTools(Socket socket, BufferedWriter writer, BufferedReader reader){
+    public void closingTools(Socket socket, BufferedWriter writer, BufferedReader reader) {
         disconnectClient();//удаляем из списка клиентов
-        //закрываем всё открытое
+        //закрываем всё открытое для этого клиента
         try {
             if (socket != null) {
                 socket.close();
@@ -94,7 +77,7 @@ public class ClientConnectionRunnable implements Runnable {
             if (reader != null) {
                 reader.close();
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

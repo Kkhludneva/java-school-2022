@@ -11,8 +11,8 @@ public class AuctionItem {
     private static String buyerName;
     public static final LocalDateTime ENDING_TIME = LocalDateTime.now().plus(30, ChronoUnit.SECONDS);
 
-
-    public static void bet(int newPrice, String buyer){
+    //теперь методы synchronized, можно не прописывать синхронизацию при обращении к ним в runnable классе
+    public static synchronized void bet(int newPrice, String buyer){
         if (LocalDateTime.now().isBefore(ENDING_TIME) && newPrice>currentPrice) {
             NumberFormat format = NumberFormat.getCurrencyInstance(Locale.getDefault());
             currentPrice = newPrice;
@@ -20,7 +20,7 @@ public class AuctionItem {
             System.out.println(buyerName+"---"+format.format(currentPrice));
         }
     }
-    public static String winner(){
+    public static synchronized String winner(){
         if (LocalDateTime.now().isAfter(ENDING_TIME)){
             return buyerName;
         }

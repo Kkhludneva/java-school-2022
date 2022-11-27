@@ -25,15 +25,15 @@ public class AuctionRunnable implements Runnable{
     @Override
     public void run() {
         while (LocalDateTime.now().isBefore(AuctionItem.ENDING_TIME)) {
-            synchronized (lock) {
                 int newBet = generateBet.nextInt();
                 AuctionItem.bet(newBet, buyers[this.numberOfBuyer]);
-
                 if (LocalDateTime.now().isAfter(AuctionItem.ENDING_TIME)) {
+                    synchronized (lock) {//оставила синхронизацию здесь, чтобы
+                        //победитель выводится только 1 раз
                     if (!auctionStopped)
                         System.out.println("\nWINNER IS:  " + AuctionItem.winner());
                     stopAuction();
-                }
+               }
             }
         }
     }
