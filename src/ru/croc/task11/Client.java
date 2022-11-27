@@ -79,7 +79,7 @@ public class Client {
         try {
             Socket socket = new Socket("localhost", 2021);
             Client client = new Client(socket,userName);
-            client.waitForMessages();//это в отдельном потоке, поэтому сможем и отправлять сообщения
+            client.waitForMessages();//это будет работать в отдельном потоке, поэтому сможем отправлять сообщения
             client.sendMessage();
         }catch (IOException e){
             e.printStackTrace();

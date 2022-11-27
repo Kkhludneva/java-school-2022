@@ -12,8 +12,10 @@ public class Server {
             System.out.println("Server Started");
 
             while(!serverSocket.isClosed()) {
+                //ждём подключения
                 Socket socket = serverSocket.accept();
                 System.out.println("Есть новое подключение...");
+                //каждое подключение обрабатывается в отдельном потоке
                 Thread newClient = new Thread(new ClientConnectionRunnable(socket));
                 newClient.start();
             }

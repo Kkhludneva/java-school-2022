@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ClientConnectionRunnable implements Runnable {
 
-    //чтобы хранить всех подключенных клиентов, и иметь возможность разослать всем сообщение
+    //чтобы хранить всех подключенных клиентов, и рассылать сообщения всем
     public static List<ClientConnectionRunnable> connectedClients = Collections.synchronizedList(new ArrayList<>());
 
     private Socket socket;
