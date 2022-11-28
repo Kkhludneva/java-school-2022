@@ -20,8 +20,11 @@ public class Task12 {
         }catch (FileNotFoundException ex){
             ex.printStackTrace();
         }
-        System.out.println("------ПОСТЫ ДО ОБРАБОТКИ----------------\n"+commentsData);
+        System.out.println("------ПОСТЫ ДО ОБРАБОТКИ----------------");
         ArrayList<String> commentsFromForum = new ArrayList<>(Arrays.asList(commentsData.split("\n\n")));
+        for (String comment: commentsFromForum) {
+            System.out.println( comment+"\n");
+        }
 
         Set<String> blackList = new HashSet<>(Arrays.asList("помидор","картошк","томат","огур","кабач","дын"));
 
@@ -29,6 +32,8 @@ public class Task12 {
         gardeningCommentsProcessing.filterComments(commentsFromForum,blackList);
 
         System.out.println("------ПОСТЫ ПОСЛЕ ОБРАБОТКИ----------------");
-        System.out.println(gardeningCommentsProcessing);
+        for (String comment: commentsFromForum) {
+            System.out.println( comment+"\n");
+        }
     }
 }
