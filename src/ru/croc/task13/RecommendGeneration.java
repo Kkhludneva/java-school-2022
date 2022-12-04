@@ -4,22 +4,22 @@ import java.util.*;
 
 public class RecommendGeneration {
 
-    private final Map<Integer, String> films;
-    private final List<List<Integer>> usersHistory;
+    private final List<Film> films;
+    private final List<List<Film>> usersHistory;
 
-    public RecommendGeneration(Map<Integer, String> films, List<List<Integer>> usersHistory) {
+    public RecommendGeneration(List<Film> films, List<List<Film>> usersHistory) {
         this.films = films;
         this.usersHistory = usersHistory;
     }
 
-    public String getRecommendation(List<Integer> curUserHistory) {
+    public String getRecommendation(List<Film> curUserHistory) {
 
-        Map<Integer, Integer> statistics = new HashMap<>();
-        Set<Integer> similarFilms = new HashSet<>();
+        Map<Film, Integer> statistics = new HashMap<>();
+        Set<Film> similarFilms = new HashSet<>();
 
-        for (List<Integer> history : usersHistory) {
+        for (List<Film> history : usersHistory) {
             similarFilms.clear();
-            for (Integer h : history) {
+            for (Film h : history) {
                 if (curUserHistory.contains(h)) {
                     //если нашли совпадение, то добавим общий элемент в множество
                     similarFilms.add(h);
@@ -28,7 +28,7 @@ public class RecommendGeneration {
             //проверяем, достаточно ли элементов в множестве
             if ((double) similarFilms.size() >= ((double) curUserHistory.size()) / 2) {
                 //пробегаемся по текущей(подходящей по кол-ву совпадений) истории
-                for (Integer h : history) {
+                for (Film h : history) {
                     if (curUserHistory.contains(h)){
                         continue;//пропускаем совпавшие эл-ты
                     }
@@ -43,23 +43,21 @@ public class RecommendGeneration {
             //ОТЛАДОЧНЫЙ ВЫВОД
             /*System.out.println("Набор: "+history);
             System.out.println("Совпали: "+similarFilms);
-            System.out.println("Текущая статистика: "+statistics);
-            */
+            System.out.println("Текущая статистика: "+statistics);*/
+
         }
         //в собранной статистике ищем самый часто встречающийся
         int max = Integer.MIN_VALUE;
-        int recommendationNumber = 0;
-        for (int i = 1; i < films.size()+1; i++) {
-            if (statistics.containsKey(i)){
-               // System.out.println(max+" --- "+statistics.get(i));
-                if (max<statistics.get(i)) {
-                    max = statistics.get(i);
-                    recommendationNumber = i;
-                }
+        Film recommendation = new Film();
+
+        for (Film f: statistics.keySet()) {
+            if (statistics.get(f) > max){
+                max = statistics.get(f);
+                recommendation = f;
             }
         }
         //возвращаем самый часто встречающийся(обращаясь к map с фильмами)
-        return films.get(recommendationNumber);
+        return recommendation.getTitle();
     }
 
 
