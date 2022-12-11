@@ -6,9 +6,6 @@ import java.util.Set;
 
 public class InvalidCommentsProcessing implements BlackListFilter{
 
-    public InvalidCommentsProcessing(){
-
-    }
     @Override
     public void filterComments(List<String> comments, Set<String> blackList) {
         for (int i = 0; i<comments.size();i++) {
