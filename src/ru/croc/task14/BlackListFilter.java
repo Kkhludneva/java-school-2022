@@ -1,9 +1,11 @@
 package ru.croc.task14;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.BiPredicate;
+import java.util.Iterator;
+import java.util.function.Predicate;
 
-public interface BlackListFilter <C,BW>{
+public interface BlackListFilter <C>{
     /**
      * From the given list of comments removes ones
      * that contain words from the black list.
@@ -11,8 +13,20 @@ public interface BlackListFilter <C,BW>{
      * @param comments list of comments; every comment
      *                 is a sequence of words, separated
      *                 by spaces, punctuation or line breaks
-     * @param blackList list of words that should not
-     *                  be present in a comment
+     * @param CommentIsForbidden predicate which accepts the comment and
+     *                     returns true if it should be deleted,
+     *                     otherwise returns true
      */
-    Collection<C> filterComments(Collection<C> comments, Collection<BW> blackList, BiPredicate<C,BW> badWordFound);
+    default Collection<C> filterComments(Iterable<C> comments, Predicate<C> CommentIsForbidden){
+        Collection<C> validComments = new ArrayList<>();
+
+        Iterator<C> it = comments.iterator();
+        while (it.hasNext()) {
+            C comment = it.next();
+            if (!CommentIsForbidden.test(comment)) {
+               validComments.add(comment);
+            }
+        }
+        return validComments;
+    }
 }

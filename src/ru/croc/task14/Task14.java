@@ -3,7 +3,7 @@ package ru.croc.task14;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class Task14 {
     public static void main(String[] args) {
@@ -18,22 +18,30 @@ public class Task14 {
         }
 
         ArrayList<String> commentsFromForum = new ArrayList<>(Arrays.asList(commentsData.split("\n\n")));
-        HashSet<String> blackList = new HashSet<>(Arrays.asList("помидор","картошк","томат","огур","кабач","дын"));
+        HashSet<String> blackList = new HashSet<>(Arrays.asList("помидор","картошк","томат","огур","кабач"));
 
-        BiPredicate <String,String> badWordFound =
-                (comment, badWord)-> {if (comment.contains(badWord)) return true;
-                                    else return false;};
+        Predicate<String> badWordFound =
+                comment ->
+                {
+                    for (String badWord: blackList) {
+                        if (comment.contains(badWord)) return true;
+                    }
+                    return false;
+                };
+
 
         CommentsProcessing processing = new CommentsProcessing();
-        Collection<String> validComments = processing.filterComments(commentsFromForum,blackList,badWordFound);
-
-        System.out.println("--------ПОСЛЕ обработки-------");
-        for (String s: validComments) {
-            System.out.println(s+"\n");
-        }
+        Collection<String> validComments = processing.filterComments(commentsFromForum,badWordFound);
+        // BlackListFilter<String> filter
+       // Collection<String> validComments = filter.filterComments(commentsFromForum,badWordFound);
 
         System.out.println("--------ДО обработки-------");
         for (String s: commentsFromForum) {
+            System.out.println(s+"\n");
+        }
+
+        System.out.println("--------ПОСЛЕ обработки-------");
+        for (String s: validComments) {
             System.out.println(s+"\n");
         }
 
