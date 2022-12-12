@@ -1,13 +1,17 @@
 package ru.croc.task15;
 
 import java.util.*;
+import java.lang.*;
 
 public class Task15 {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        String ageString = scanner.nextLine();
-        ArrayList<Integer> ageBounders = parseToAgeBounders(ageString);
+
+        ArrayList<Integer> ageBounders = parseToAgeBounders(args);
+
+        //System.out.println(ageBounders);
+
         ArrayList<Person> people = new ArrayList<>();
         String s = scanner.nextLine();
 
@@ -38,12 +42,12 @@ public class Task15 {
         return new Person(personData[0], Integer.valueOf(personData[1]));
     }
 
-    public static ArrayList<Integer> parseToAgeBounders(String ageString) {
-        String[] ages = ageString.split("\\s");
+    public static ArrayList<Integer> parseToAgeBounders(String[] ages) {
+
         ArrayList<Integer> ageBounders = new ArrayList<>();
         ageBounders.add(0);
-        for (int i = 1; i < ages.length; i++) {
-            if (ageBounders.get(i - 1) >= Integer.valueOf(ages[i])) {
+        for (int i = 0; i < ages.length; i++) {
+            if (ageBounders.get(i ) >= Integer.valueOf(ages[i])) {
                 System.err.println("Некорректный ввод");
                 System.exit(0);
             }
