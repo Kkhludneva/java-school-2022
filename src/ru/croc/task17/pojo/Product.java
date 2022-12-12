@@ -1,4 +1,4 @@
-package ru.croc.task17.POJO;
+package ru.croc.task17.pojo;
 
 
 import java.util.Objects;

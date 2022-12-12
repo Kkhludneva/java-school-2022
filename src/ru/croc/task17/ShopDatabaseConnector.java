@@ -1,11 +1,9 @@
 package ru.croc.task17;
 
-import ru.croc.task17.DAO.OrderDAO;
-import ru.croc.task17.DAO.ProductDAO;
-import ru.croc.task17.DAO.UserDAO;
-import ru.croc.task17.POJO.Order;
-import ru.croc.task17.POJO.Product;
-import ru.croc.task17.POJO.User;
+import ru.croc.task17.dao.OrderDAO;
+import ru.croc.task17.dao.ProductDAO;
+import ru.croc.task17.pojo.Order;
+import ru.croc.task17.pojo.Product;
 
 import java.sql.*;
 
@@ -22,19 +20,14 @@ public class ShopDatabaseConnector {
         try {
             Connection conn = DriverManager.getConnection(URL);
             final Statement creatingTables = conn.createStatement();
-            creatingTables.execute("create table users(orderNumber integer primary key, login varchar);");
             creatingTables.execute("create table products(productCode varchar primary key," +
                     " productName varchar," +
                     "price integer);");
-            creatingTables.execute("create table orders(orderNumber integer, productCode varchar," +
-                    "CONSTRAINT FK_orderNum FOREIGN KEY (orderNumber) " +
-                    " REFERENCES users (orderNumber)," +
+            creatingTables.execute("create table orders(orderNumber integer, userLogin varchar,productCode varchar," +
                     "CONSTRAINT FK_prodNum FOREIGN KEY (productCode) " +
                     "   REFERENCES products (productCode));");
 
-            for (User user: parser.getUsers()) {
-                UserDAO.create(user);
-            }
+
             for (Product product: parser.getProducts()) {
                 ProductDAO.create(product);
             }
@@ -48,8 +41,7 @@ public class ShopDatabaseConnector {
     }
 
     public void showShopDatabase(){
-        UserDAO.selectAll();
-        ProductDAO.selectAll();
-        OrderDAO.selectAll();
+        ProductDAO.printAll();
+        OrderDAO.printAll();
     }
 }

@@ -1,7 +1,7 @@
-package ru.croc.task17.DAO;
+package ru.croc.task17.dao;
 
 import ru.croc.task17.ShopDatabaseConnector;
-import ru.croc.task17.POJO.Product;
+import ru.croc.task17.pojo.Product;
 
 import java.sql.*;
 
@@ -20,7 +20,7 @@ public class ProductDAO {
         }
     }
 
-    public static void selectAll() {
+    public static void printAll() {
         try (Connection conn = DriverManager.getConnection(ShopDatabaseConnector.URL)) {
             Statement selectStatement = conn.createStatement();
             System.out.println("-----Table: products------");
