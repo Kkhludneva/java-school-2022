@@ -7,7 +7,7 @@ import java.util.Objects;
 public class Order {
     private final int number;
     private final String userLogin;
-    private final List<String> productCodes;
+    private final List<Product> products;
 
     public int getNumber() {
         return number;
@@ -17,26 +17,26 @@ public class Order {
         return userLogin;
     }
 
-    public List<String> getProductCodes() {
-        return productCodes;
+    public List<Product> getProductCodes() {
+        return products;
     }
 
-    public Order(int n, String userLogin, List<String> prCodes){
+    public Order(int n, String userLogin, List<Product> prCodes){
         this.number = n;
         this.userLogin = userLogin;
-        this.productCodes = new ArrayList<>(prCodes);
+        this.products = new ArrayList<>(prCodes);
     }
 
     @Override
     public String toString() {
-        return number+": "+ productCodes;
+        return number+": "+ products;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Order order)) return false;
-        return number == order.number && Objects.equals(productCodes, order.productCodes);
+        return number == order.number && Objects.equals(products, order.products);
     }
 
 }

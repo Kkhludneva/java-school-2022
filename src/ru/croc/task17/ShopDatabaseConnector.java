@@ -8,31 +8,37 @@ import ru.croc.task17.pojo.Product;
 import java.sql.*;
 
 public class ShopDatabaseConnector {
-    public static final String URL = "jdbc:h2:mem:~/shop";
+
+    public final Connection dbConnection;
     private final FileToObjectsParser parser;
 
-    public ShopDatabaseConnector(FileToObjectsParser parser){
+
+
+    public ShopDatabaseConnector(FileToObjectsParser parser,Connection dbConnection){
         this.parser = parser;
+        this.dbConnection =dbConnection;
     }
 
     public void createShopDatabase(){
 
         try {
-            Connection conn = DriverManager.getConnection(URL);
-            final Statement creatingTables = conn.createStatement();
-            creatingTables.execute("create table products(productCode varchar primary key," +
-                    " productName varchar," +
-                    "price integer);");
-            creatingTables.execute("create table orders(orderNumber integer, userLogin varchar,productCode varchar," +
-                    "CONSTRAINT FK_prodNum FOREIGN KEY (productCode) " +
-                    "   REFERENCES products (productCode));");
+            final Statement creatingTables = dbConnection.createStatement();
 
+            creatingTables.execute("create table product(product_code varchar primary key," +
+                    " product_name varchar," +
+                    "price integer);");
+            creatingTables.execute("create table \"order\" (order_number integer, user_login varchar,product_code varchar," +
+                    "CONSTRAINT FK_prodNum FOREIGN KEY (product_code) " +
+                    "   REFERENCES product (product_code) ON DELETE CASCADE);");
+
+            ProductDAO productDAO = new ProductDAO(dbConnection);
+            OrderDAO orderDAO = new OrderDAO(dbConnection);
 
             for (Product product: parser.getProducts()) {
-                ProductDAO.create(product);
+               productDAO.create(product);
             }
             for (Order order: parser.getOrdersHistory()) {
-                OrderDAO.create(order);
+                orderDAO.create(order);
             }
 
         } catch (SQLException e) {
@@ -41,7 +47,9 @@ public class ShopDatabaseConnector {
     }
 
     public void showShopDatabase(){
-        ProductDAO.printAll();
-        OrderDAO.printAll();
+        ProductDAO productDAO = new ProductDAO(dbConnection);
+        OrderDAO orderDAO = new OrderDAO(dbConnection);
+        productDAO.printAll();
+       orderDAO.printAll();
     }
 }

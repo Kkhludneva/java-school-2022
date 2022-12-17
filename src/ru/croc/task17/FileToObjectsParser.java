@@ -9,8 +9,8 @@ import java.util.*;
 
 public class FileToObjectsParser {
 
-    private Set<Product> products = new HashSet<>();
-    private Set<Order> ordersHistory = new TreeSet<>(Comparator.comparingInt(Order::getNumber));
+    private final Set<Product> products = new HashSet<>();
+    private final Set<Order> ordersHistory = new TreeSet<>(Comparator.comparingInt(Order::getNumber));
 
 
     public Set<Product> getProducts() {
@@ -22,13 +22,13 @@ public class FileToObjectsParser {
     }
 
     public FileToObjectsParser(File f){
-        Map <Integer, List<String> > orderItems = new HashMap<>();
+        Map <Integer, List<Product> > orderItems = new HashMap<>();
         Map <Integer, String> orderOwner = new HashMap<>();
         try (Scanner scanner = new Scanner(f)) {
             while (scanner.hasNextLine()) {
                 String[] s = scanner.nextLine().split(",");
                 this.products.add(new Product(s[2], s[3], Integer.valueOf(s[4])));
-                orderItems.computeIfAbsent(Integer.valueOf(s[0]), k -> new ArrayList<>()).add(s[2]);
+                orderItems.computeIfAbsent(Integer.valueOf(s[0]), k -> new ArrayList<>()).add(new Product(s[2], s[3], Integer.valueOf(s[4])));
                 orderOwner.put(Integer.valueOf(s[0]),s[1]);
             }
         } catch (FileNotFoundException e) {

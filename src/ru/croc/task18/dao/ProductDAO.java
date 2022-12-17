@@ -2,97 +2,126 @@ package ru.croc.task18.dao;
 
 
 import ru.croc.task17.pojo.Product;
-import ru.croc.task18.ShopDatabaseConnector;
 
 import java.sql.*;
 
 public class ProductDAO {
-    public static Product createProduct(Product product) throws java.sql.SQLException{
-        try (Connection conn = DriverManager.getConnection(ShopDatabaseConnector.URL)) {
-            String sql = "INSERT  INTO  products (price,productName,productCode) values(?,?,?)";
-            try (PreparedStatement statement = conn.prepareStatement(sql)) {
-                statement.setString(3, product.getCode());
-                statement.setString(2, product.getName());
-                statement.setInt(1,product.getPrice());
-                statement.executeUpdate();
-            }
-        }
-        return product;
+    private final Connection dbConnection;
+
+    public ProductDAO(Connection connection) {
+        this.dbConnection = connection;
     }
 
-    public static Product findProduct(String productCode) {
+    public Product createProduct(Product product) throws java.sql.SQLException {
+        String sql = "INSERT  INTO  product values(?,?,?)";
         Product p = null;
-        try (Connection conn = DriverManager.getConnection(ShopDatabaseConnector.URL)) {
-            String sql = "SELECT * FROM products WHERE productCode = ?";
-            try (PreparedStatement statement = conn.prepareStatement(sql)) {
-               statement.setString(1, productCode);
-                try (ResultSet result = statement.executeQuery()) {
+        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setString(1, product.getCode());
+            statement.setString(2, product.getName());
+            statement.setInt(3, product.getPrice());
+            statement.executeUpdate();
+
+            //ищем по первичному ключу, что добавилось
+            String findUpdates = "select * from product where product_code = ? ;";
+            PreparedStatement statementFindUpdates = dbConnection.prepareStatement(findUpdates);
+            statementFindUpdates.setString(1,product.getCode());
+            statementFindUpdates.executeQuery();
+            boolean hasRslt = statementFindUpdates.execute();
+            //если что-то добавилось, обновим p
+            if (hasRslt) {
+                try (ResultSet result = statementFindUpdates.getResultSet()) {
                     while (result.next()) {
-                        String Code = result.getString("productCode");
-                        String productName = result.getString("productName");
-                        int price = result.getInt("price");
-                        p = new Product(Code, productName, price);
+                        String productCode = result.getString("product_code");
+                        String productName = result.getString("product_name");
+                        int productPrice = result.getInt("price");
+                        p = new Product(productCode,productName,productPrice);
                     }
                 }
             }
-        }catch (java.sql.SQLException e){
-            throw new RuntimeException();
         }
         return p;
     }
-    public static Product updateProduct(Product product){
+
+    public Product findProduct(String productCode) {
         Product p = null;
-        try (Connection conn = DriverManager.getConnection(ShopDatabaseConnector.URL)) {
-            String sql = "UPDATE products SET productName =? , price = ? WHERE productCode = ? ; ";
-            try (PreparedStatement statement = conn.prepareStatement(sql)) {
-                statement.setString(3, product.getCode());
-                statement.setString(1, product.getName());
-                statement.setInt(2, product.getPrice());
-                statement.executeUpdate();
-                p = new Product(product.getCode(),product.getName(),product.getPrice());
+        String sql = "SELECT * FROM product WHERE product_code = ?";
+        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setString(1, productCode);
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    String code = result.getString("product_code");
+                    String productName = result.getString("product_name");
+                    int price = result.getInt("price");
+                    p = new Product(code, productName, price);
+                }
             }
-        }catch (java.sql.SQLException e){
-            throw new RuntimeException();
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
         }
         return p;
     }
 
-    public static void deleteProduct(String productCode){
-        try (Connection conn = DriverManager.getConnection(ShopDatabaseConnector.URL)) {
-            String sqlForProducts = "DELETE FROM products WHERE productCode = ? ; ";
-            try (PreparedStatement statement = conn.prepareStatement(sqlForProducts)) {
-                statement.setString(1, productCode);
-                statement.executeUpdate();
+    public Product updateProduct(Product product) {
+        String sql = "UPDATE product SET product_name =? , price = ? WHERE product_code = ? ; ";
+        Product p = null;
+        try {
+            PreparedStatement statement1 = dbConnection.prepareStatement(sql);
+            statement1.setString(1, product.getName());
+            statement1.setInt(2, product.getPrice());
+            statement1.setString(3, product.getCode());
+            statement1.executeUpdate();
+
+            //ищем по первичному ключу, что добавилось
+            String findUpdates = "select * from product where product_code = ? ;";
+            PreparedStatement statementFindUpdates = dbConnection.prepareStatement(findUpdates);
+            statementFindUpdates.setString(1,product.getCode());
+            statementFindUpdates.executeQuery();
+            boolean hasRslt = statementFindUpdates.execute();
+            //если что-то добавилось, обновим p
+            if (hasRslt) {
+                try (ResultSet result = statementFindUpdates.getResultSet()) {
+                    while (result.next()) {
+                        String productCode = result.getString("product_code");
+                        String productName = result.getString("product_name");
+                        int productPrice = result.getInt("price");
+                        p = new Product(productCode,productName,productPrice);
+                    }
+                }
             }
-            String sqlForOrders = "DELETE FROM orders WHERE productCode = ? ; ";
-            try (PreparedStatement statement = conn.prepareStatement(sqlForOrders)) {
-                statement.setString(1, productCode);
-                statement.executeUpdate();
-            }
-        }catch (java.sql.SQLException e){
-            throw new RuntimeException();
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
         }
-
-
+        return p;
     }
 
-    public static void printAll() {
-        try (Connection conn = DriverManager.getConnection(ShopDatabaseConnector.URL)) {
-            Statement selectStatement = conn.createStatement();
-            System.out.println("-----Table: products------");
-            boolean hasRslt = selectStatement.execute("select * from products");
-            if (hasRslt){
+    public void deleteProduct(String productCode) {
+        String sqlForProducts = "DELETE FROM product WHERE product_code = ? ; ";
+        //из таблицы Order записи удалятся каскадно за счёт параметров внешнего ключа
+        try (PreparedStatement statement = dbConnection.prepareStatement(sqlForProducts)) {
+            statement.setString(1, productCode);
+            statement.executeUpdate();
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void printAll() {
+        try {
+            Statement selectStatement = dbConnection.createStatement();
+            System.out.println("-----Table: product------");
+            boolean hasRslt = selectStatement.execute("select * from product order by product_code");
+            if (hasRslt) {
                 try (ResultSet result = selectStatement.getResultSet()) {
                     while (result.next()) {
-                        String productCode = result.getString("productCode");
-                        String productName = result.getString("productName");
+                        String productCode = result.getString("product_code");
+                        String productName = result.getString("product_name");
                         int price = result.getInt("price");
-                        System.out.println(productCode+" | "+productName+ " | "+price);
+                        System.out.println(productCode + " | " + productName + " | " + price);
                     }
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }
