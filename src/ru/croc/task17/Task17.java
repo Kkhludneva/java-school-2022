@@ -12,6 +12,5 @@ public class Task17 {
         connector.createShopDatabase();
         connector.showShopDatabase();
 
-
     }
 }
