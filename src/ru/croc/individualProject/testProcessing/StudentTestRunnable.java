@@ -11,7 +11,7 @@ import java.util.*;
 
 public class StudentTestRunnable implements Runnable {
 
-    public static final int NUMBER_OF_TASKS = 3;
+    public static final int NUMBER_OF_TASKS = 10;
     private static final List<Verb> allIrregularVerbs = new VerbParser
             ( new File("./src/ru/croc/individualProject/verbProcessing/irregularVerbs.txt")).parseToVerbs();
     private Socket socket;
